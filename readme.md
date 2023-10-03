@@ -35,9 +35,9 @@ el modulo necesario para que las funciones trabajen.
 ### Uso
 El uso es simple: La liga que en el que se encuentra este repositorio se puede utilizar en Render directamente para realizar un servicio web. Render tiene la opcion de utilizar nuestro repositorio directamente siempre y cuando sea de dominio publico. 
 
-Al utilizar la liga de repositorio solo necesitamos ponerle un nombre a nuestro servicio, elegir un servidor cercano a nuestra ubicación; en mi caso no se me da la geografia y escogí Oregon cuando el mas cercano era Ohio, de igual manera es importante que pueda instalar nuestro ambiente virtual del archivo "requirementes.txt" asi que puede que tengamos que hacer el commit cambiando nuestras versiones conforme Render lo solicite. Y en la sección de "Start Command" ponemos "uvicorn main:app --host 0.0.0.0 --port 8000.
+Al utilizar la liga de repositorio solo necesitamos ponerle un nombre a nuestro servicio, elegir un servidor cercano a nuestra ubicación; en mi caso no se me da la geografia y escogí Oregon cuando el más cercano era Ohio, de igual manera es importante que pueda instalar nuestro ambiente virtual del archivo "requirementes.txt" asi que puede que tengamos que hacer el commit cambiando nuestras versiones conforme Render lo solicite. Y en la sección de "Start Command" ponemos "uvicorn main:app --host 0.0.0.0 --port 8000.
 
-Al terminar con los ajustes podemos proceder al deploy de la API si todo está correcto y las versiones de los modulos son compatibles con Render el deploy será exitoso.
+Al terminar con los ajustes podemos proceder al deploy de la API si todo está correcto y las versiones de los módulos son compatibles con Render el deploy será exitoso.
 
 
 
