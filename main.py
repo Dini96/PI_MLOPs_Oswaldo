@@ -115,5 +115,7 @@ def UsersNotRecommend( anio : int ): #Devuelve el top 3 de juegos MENOS recomend
 @app.get("/Sentiment_Analysis/{int}")
 def sentiment_analysis(anio:int):
     filter=df_reviews_games[(df_reviews_games["release_date"] == anio)]
+    if filter.empty:
+        return {"No existen juegos no recomendados para este año, pruebe con otra fecha por favor"}
     grouped= filter.groupby("app_name")["sentiment_analysis"].value_counts().unstack(fill_value=0).reset_index()
     return {"Negative = "+str(grouped[0].sum()),"Neutral = "+str(grouped[1].sum()),"Positive = "+str(grouped[2].sum())}
