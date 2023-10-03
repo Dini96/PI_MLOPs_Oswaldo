@@ -14,6 +14,11 @@ df_items = pd.DataFrame(pd.read_csv(r"src/items.csv",sep='|'))
 df_item_games=pd.merge(df_items,df_games, left_on="item_id",right_on="id")[["user_id","genres","release_date","playtime_forever"]]
 df_reviews_games=pd.merge(df_reviews,df_games,left_on="item_id",right_on="id")[["user_id","release_date","recommend","sentiment_analysis","item_id","app_name"]]
 
+#Definimos ruta para la raiz de la aplicación
+@app.get("/")
+async def root():
+    return {"Mensaje": "¡Bienvenido a mi aplicacion de FastAPI!"}
+
 #La siguiente funcion regresa el año que mas horas de juego acumuló, tiene parametro de entrada un string con el genero a revisar.
 @app.get("/playtime_genre/{genero}")
 def PlayTimeGenre(genero:str):
