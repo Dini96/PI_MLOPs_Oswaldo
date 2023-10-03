@@ -1,5 +1,7 @@
 from fastapi import FastAPI
 import pandas as pd
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 
 
 
@@ -9,6 +11,7 @@ app=FastAPI()
 df_reviews = pd.DataFrame(pd.read_csv(r"src/reviews.csv",sep='|'))
 df_games = pd.DataFrame(pd.read_csv(r"src/steam_games.csv",sep='|'))
 df_items = pd.DataFrame(pd.read_csv(r"src/items.csv",sep='|'))
+df_ml=pd.DataFrame(pd.read_csv(r"src/reviews_nosentiment.csv",sep="|"))
 
 #realizamos los merge necesarios para las funciones
 df_item_games=pd.merge(df_items,df_games, left_on="item_id",right_on="id")[["user_id","genres","release_date","playtime_forever"]]
@@ -119,3 +122,35 @@ def sentiment_analysis(anio:int):
         return {"No existen juegos no recomendados para este año, pruebe con otra fecha por favor"}
     grouped= filter.groupby("app_name")["sentiment_analysis"].value_counts().unstack(fill_value=0).reset_index()
     return {"Negative = "+str(grouped[0].sum()),"Neutral = "+str(grouped[1].sum()),"Positive = "+str(grouped[2].sum())}
+
+@app.get("/Recomendacion_Usuario/{str}")
+def get_recommendations(user_id:str):
+    num_recommendations=5
+    # Filtrar las reseñas del usuario específico
+    user_reviews = df_ml[df_ml['user_id'] == user_id]['review'].tolist()
+
+    # Inicializar el vectorizador TF-IDF
+    tfidf_vectorizer = TfidfVectorizer()
+
+    # Calcular la matriz TF-IDF para las reseñas del usuario
+    tfidf_matrix = tfidf_vectorizer.fit_transform(user_reviews)
+
+    # Calcular la similitud de coseno entre todas las reseñas del usuario
+    cosine_similarities = cosine_similarity(tfidf_matrix, tfidf_matrix)
+
+    # Obtener las reseñas más similares a las del usuario actual
+    similar_indices = cosine_similarities.argsort()[:, ::-1]  # Ordenar en orden descendente
+
+    # Obtener las recomendaciones basadas en similitud
+    recommendations = []
+    seen_item_ids = set(df_ml[df_ml['user_id'] == user_id]['item_id'].tolist())
+
+    for idx in similar_indices[0]:
+        item_id = df_ml.iloc[idx]['item_id']
+        if item_id not in seen_item_ids:
+            recommendations.append(int(item_id))
+            seen_item_ids.add(item_id)
+            if len(recommendations) >= num_recommendations:
+                break
+
+    return recommendations
