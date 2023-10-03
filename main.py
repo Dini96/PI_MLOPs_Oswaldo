@@ -154,3 +154,43 @@ def get_recommendations(user_id:str):
                 break
 
     return recommendations
+
+@app.get("/Recomendacion_UsuarioGPT/{str}")
+def get_recommendations(user_id:str):
+    num_recommendations = 5
+    
+    # Convertir el user_id a minúsculas
+    user_id = user_id.lower()
+    
+    # Verificar si el usuario existe en la base de datos
+    if user_id not in df_ml['user_id'].str.lower().unique():
+        return "Usuario no encontrado. Por favor, verifica el nombre de usuario."
+    
+    # Filtrar las reseñas del usuario específico
+    user_reviews = df_ml[df_ml['user_id'].str.lower() == user_id]['review'].tolist()
+
+    # Inicializar el vectorizador TF-IDF
+    tfidf_vectorizer = TfidfVectorizer()
+
+    # Calcular la matriz TF-IDF para las reseñas del usuario
+    tfidf_matrix = tfidf_vectorizer.fit_transform(user_reviews)
+
+    # Calcular la similitud de coseno entre todas las reseñas del usuario
+    cosine_similarities = cosine_similarity(tfidf_matrix, tfidf_matrix)
+
+    # Obtener las reseñas más similares a las del usuario actual
+    similar_indices = cosine_similarities.argsort()[:, ::-1]  # Ordenar en orden descendente
+
+    # Obtener las recomendaciones basadas en similitud
+    recommendations = []
+    seen_item_ids = set(df_ml[df_ml['user_id'].str.lower() == user_id]['item_id'].tolist())
+
+    for idx in similar_indices[0]:
+        item_id = df_ml.iloc[idx]['item_id']
+        if item_id not in seen_item_ids:
+            recommendations.append(int(item_id))
+            seen_item_ids.add(item_id)
+            if len(recommendations) >= num_recommendations:
+                break
+
+    return recommendations
