@@ -123,40 +123,9 @@ def sentiment_analysis(anio:int):
     grouped= filter.groupby("app_name")["sentiment_analysis"].value_counts().unstack(fill_value=0).reset_index()
     return {"Negative = "+str(grouped[0].sum()),"Neutral = "+str(grouped[1].sum()),"Positive = "+str(grouped[2].sum())}
 
+
 @app.get("/Recomendacion_Usuario/{str}")
-def get_recommendations(user_id:str):
-    num_recommendations=5
-    # Filtrar las reseñas del usuario específico
-    user_reviews = df_ml[df_ml['user_id'] == user_id]['review'].tolist()
-
-    # Inicializar el vectorizador TF-IDF
-    tfidf_vectorizer = TfidfVectorizer()
-
-    # Calcular la matriz TF-IDF para las reseñas del usuario
-    tfidf_matrix = tfidf_vectorizer.fit_transform(user_reviews)
-
-    # Calcular la similitud de coseno entre todas las reseñas del usuario
-    cosine_similarities = cosine_similarity(tfidf_matrix, tfidf_matrix)
-
-    # Obtener las reseñas más similares a las del usuario actual
-    similar_indices = cosine_similarities.argsort()[:, ::-1]  # Ordenar en orden descendente
-
-    # Obtener las recomendaciones basadas en similitud
-    recommendations = []
-    seen_item_ids = set(df_ml[df_ml['user_id'] == user_id]['item_id'].tolist())
-
-    for idx in similar_indices[0]:
-        item_id = df_ml.iloc[idx]['item_id']
-        if item_id not in seen_item_ids:
-            recommendations.append(int(item_id))
-            seen_item_ids.add(item_id)
-            if len(recommendations) >= num_recommendations:
-                break
-
-    return recommendations
-
-@app.get("/Recomendacion_UsuarioGPT/{str}")
-def get_recommendations(user_id:str):
+def recomendacion_usuario(user_id:str):
     num_recommendations = 5
     
     # Convertir el user_id a minúsculas
