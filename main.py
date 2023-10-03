@@ -1,8 +1,7 @@
 from fastapi import FastAPI
 import pandas as pd
-import os
 
-port = int(os.environ.get("PORT", 10000))  #definimos el puerto para hacer el deploy
+
 
 app=FastAPI()
 
